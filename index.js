@@ -9,6 +9,7 @@ var ec2 = new AWS.EC2({apiVersion: '2016-11-15'});
 
 function main(){
     var instanceParams = {
+        //Will get all instances
         IncludeAllInstances: true
      };
     ec2.describeInstanceStatus(instanceParams,function(err, data){
@@ -18,7 +19,7 @@ function main(){
         else
             for(var index in data['InstanceStatuses']){
                 var  instance =  data['InstanceStatuses'][index];
-              
+                //Only contemplates instances that are running
                 if(instance.InstanceState.Name=='running'){
                     var params = {
                         Filters: [
@@ -30,12 +31,14 @@ function main(){
                          }
                         ]
                     };
-
+                    //For every running instance that it finds it gets the corresponding tags
                     ec2.describeTags(params, function(err, tag_data) {
                         if (err) console.log(err, err.stack);
                         else  
+                            //Double loop to get to the tag info (ther might be a beter way to do this)
                             for(var e in tag_data){
                                 for (var i in tag_data[e]){
+                                    //If it finds the tag 'Retention' then it saves the retetion period
                                     if(tag_data[e][i].Key == 'Retention'){  
                                         Backups_checker(tag_data[e][i].ResourceId,tag_data[e][i].Value);
                                     }
