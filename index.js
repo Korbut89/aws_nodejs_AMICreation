@@ -39,9 +39,13 @@ function main(){
                             for(var e in tag_data){
                                 for (var i in tag_data[e]){
                                     //If it finds the tag 'Retention' then it saves the retetion period
-                                    if(tag_data[e][i].Key == 'Retention'){  
+                                    if(tag_data[e][i].Key == 'Retention'){
+                                        //If Retention period of a image is grater then the specified then:
+                                            //Images of that instance are deregistered in the Backup_checker
                                         Backups_checker(tag_data[e][i].ResourceId,tag_data[e][i].Value);
                                     }
+                                    //If it finds the tag 'Backup' with the value of true then a AMI is created with the following name
+                                    //instance.id+"-"+date_time.today(in miliseconds)
                                     if(tag_data[e][i].Key == 'Backup' && tag_data[e][i].Value == 'true'){
                                         console.log('Creating AMI for the instance: '+tag_data[e][i].ResourceId);
                                         create_image(tag_data[e][i].ResourceId,Date.now());
