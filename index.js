@@ -1,12 +1,11 @@
-const AWS = require('aws-sdk')
+const AWS = require('aws-sdk');
 const DateDiff = require('date-diff');
 
-AWS.config.loadFromPath('./config.json')
+AWS.config.loadFromPath('./config.json');
 
-retention_period = 7
-today = new Date()
+var today = new Date();
 
-var ec2 = new AWS.EC2({apiVersion: '2016-11-15'})
+var ec2 = new AWS.EC2({apiVersion: '2016-11-15'});
 
 function main(){
     var instanceParams = {
@@ -14,11 +13,11 @@ function main(){
      };
     ec2.describeInstanceStatus(instanceParams,function(err, data){
         if(err){
-            console.log(err, err.stack)
+            console.log(err, err.stack);
         }
         else
-            for(index in data['InstanceStatuses']){
-                var  instance =  data['InstanceStatuses'][index]
+            for(var index in data['InstanceStatuses']){
+                var  instance =  data['InstanceStatuses'][index];
               
                 if(instance.InstanceState.Name=='running'){
                     var params = {
@@ -35,23 +34,23 @@ function main(){
                     ec2.describeTags(params, function(err, tag_data) {
                         if (err) console.log(err, err.stack);
                         else  
-                            for(e in tag_data){
-                                for (i in tag_data[e]){
+                            for(var e in tag_data){
+                                for (var i in tag_data[e]){
                                     if(tag_data[e][i].Key == 'Retention'){  
-                                        Backups_checker(tag_data[e][i].ResourceId,tag_data[e][i].Value)
+                                        Backups_checker(tag_data[e][i].ResourceId,tag_data[e][i].Value);
                                     }
                                     if(tag_data[e][i].Key == 'Backup' && tag_data[e][i].Value == 'true'){
-                                        console.log('Creating AMI for the instance: '+tag_data[e][i].ResourceId)
-                                        create_image(tag_data[e][i].ResourceId,Date.now())
+                                        console.log('Creating AMI for the instance: '+tag_data[e][i].ResourceId);
+                                        create_image(tag_data[e][i].ResourceId,Date.now());
                                     }  
                                 }
                             }
                     });
                 }
                 else
-                    console.log("WARNING - "+instance.InstanceId+" DOWN\n")
+                    console.log("WARNING - "+instance.InstanceId+" DOWN\n");
             }
-    })  
+    }) ; 
 }
 
 function Backups_checker(instance,retention_period){
@@ -64,23 +63,23 @@ function Backups_checker(instance,retention_period){
 
     ec2.describeImages(params,function(err,data){
         if(err){
-            console.log(err, err.stack)
+            console.log(err, err.stack);
         }
         else
             if(data.Images.length != 0){
-                for(e in data.Images){
-                    creation_date = new Date(data.Images[e].CreationDate)
-                    diference = new DateDiff(today,creation_date)
-                    AMI_ID = data.Images[e].ImageId
+                for(var e in data.Images){
+                    var creation_date = new Date(data.Images[e].CreationDate);
+                    var diference = new DateDiff(today,creation_date);
+                    var AMI_ID = data.Images[e].ImageId;
                     if(diference > retention_period){
-                        console.log("INFO - AMI|"+AMI_ID+" |Instance "+instance+"| Creation Day "+diference.days())
-                        deregister_image(data.Images[e].ImageId)
+                        console.log("INFO - AMI|"+AMI_ID+" |Instance "+instance+"| Creation Day "+diference.days());
+                        deregister_image(data.Images[e].ImageId);
                     }
                     else
-                        console.log("INFO - AMI|"+AMI_ID+" |Instance "+instance+"| Creation Day "+diference.days())  
+                        console.log("INFO - AMI|"+AMI_ID+" |Instance "+instance+"| Creation Day "+diference.days());
                 }
             }
-    })
+    });
 }
 
 function create_image(instance,today){
@@ -89,17 +88,17 @@ function create_image(instance,today){
         Name: instance+'-'+today,
         NoReboot: true,
         Description: 'Instance: '+instance
-    }
+    };
     ec2.createImage(params,function(err,data){
         if(err){
-            console.log(err, err.stack)
+            console.log(err, err.stack);
         }
         else
-            console.log(data)
-    })
+            console.log(data);
+    });
 }
 function deregister_image(image){
-    console.log('Deregistering AMI: '+image)
+    console.log('Deregistering AMI: '+image);
     var params = {
         ImageId: image, 
         
@@ -109,5 +108,4 @@ function deregister_image(image){
         else     console.log(data);
       });
 }
-
 main()
