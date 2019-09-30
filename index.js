@@ -1,7 +1,9 @@
 const AWS = require('aws-sdk');
 const DateDiff = require('date-diff');
 
-AWS.config.loadFromPath('./config.json');
+AWS.config.loadFromPath('./config.json',function(teste){
+    console.log(data)
+});
 
 var today = new Date();
 
@@ -14,7 +16,7 @@ function main(){
      };
     ec2.describeInstanceStatus(instanceParams,function(err, data){
         if(err){
-            console.log(err, err.stack);
+            console.log(err.message);
         }
         else
             for(var index in data['InstanceStatuses']){
@@ -33,7 +35,7 @@ function main(){
                     };
                     //For every running instance that it finds it gets the corresponding tags
                     ec2.describeTags(params, function(err, tag_data) {
-                        if (err) console.log(err, err.stack);
+                        if (err) console.log(err.message);
                         else  
                             //Double loop to get to the tag info (ther might be a beter way to do this)
                             for(var e in tag_data){
@@ -70,7 +72,7 @@ function Backups_checker(instance,retention_period){
 
     ec2.describeImages(params,function(err,data){
         if(err){
-            console.log(err, err.stack);
+            console.log(err.message);
         }
         else
             if(data.Images.length != 0){
@@ -98,7 +100,7 @@ function create_image(instance,today){
     };
     ec2.createImage(params,function(err,data){
         if(err){
-            console.log(err, err.stack);
+            console.log(err.message);
         }
         else
             console.log(data);
@@ -111,7 +113,7 @@ function deregister_image(image){
         
       };
       ec2.deregisterImage(params, function(err, data) {
-        if (err) console.log(err, err.stack);
+        if (err) console.log(err.message);
         else     console.log(data);
       });
 }
