@@ -1,9 +1,7 @@
 const AWS = require('aws-sdk');
 const DateDiff = require('date-diff');
 
-AWS.config.loadFromPath('./config.json',function(teste){
-    console.log(data)
-});
+AWS.config.loadFromPath('./config.json');
 
 var today = new Date();
 
