@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "nodejs index.js"
   },
   "author": "",
   "license": "ISC",
@@ -12,6 +13,7 @@
     "aws-sdk": "^2.533.0",
     "date-diff": "^0.2.1",
     "install": "^0.13.0",
-    "npm": "^6.11.3"
+    "npm": "^6.11.3",
+    "yarn": "^1.19.0"
   }
 }
